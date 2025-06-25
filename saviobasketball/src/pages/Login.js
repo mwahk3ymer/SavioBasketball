@@ -56,6 +56,10 @@ const Login = () => {
         </button>
         {errorMsg && <p style={styles.error}>{errorMsg}</p>}
       </form>
+      <p>
+  Don’t have an account? <a href="/register">Register here</a>
+</p>
+
     </div>
   );
 };
