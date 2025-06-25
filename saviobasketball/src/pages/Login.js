@@ -59,6 +59,9 @@ const Login = () => {
       <p>
   Don’t have an account? <a href="/register">Register here</a>
 </p>
+<p>
+  Are you an admin? <a href="/register-admin">Register as admin</a>
+</p>
 
     </div>
   );

@@ -4,33 +4,43 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
-const Register = () => {
+const RegisterAdmin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [adminCode, setAdminCode] = useState("");
   const navigate = useNavigate();
+
+  const SECRET_CODE = "Savio2025Admin!";
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (adminCode !== SECRET_CODE) {
+      alert("❌ Invalid admin code");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Add role info to Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
-        role: "player",
+        role: "admin",
       });
-      
-      alert("🎉 Account created! You’re now logged in.");
-      navigate("/player"); // Send them to the player dashboard
+
+      alert("🎉 Admin account created!");
+      navigate("/admin");
     } catch (err) {
-      console.error("Registration error:", err.message);
+      console.error("Admin registration error:", err.message);
       alert("❌ " + err.message);
     }
   };
 
   return (
     <div>
-      <h2>Register</h2>
+      <h2>Register as Admin</h2>
       <form onSubmit={handleRegister}>
         <input
           type="email"
@@ -46,10 +56,17 @@ const Register = () => {
           required
           onChange={(e) => setPassword(e.target.value)}
         /><br/>
-        <button type="submit">Create Account</button>
+        <input
+          type="text"
+          placeholder="Admin Code"
+          value={adminCode}
+          required
+          onChange={(e) => setAdminCode(e.target.value)}
+        /><br/>
+        <button type="submit">Create Admin Account</button>
       </form>
     </div>
   );
 };
 
-export default Register;
+export default RegisterAdmin;

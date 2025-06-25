@@ -6,7 +6,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import PlayerDashboard from "./pages/PlayerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
-
+import RegisterAdmin from "./pages/RegisterAdmin";
 
 function App() {
   return (
@@ -14,6 +14,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register-admin" element={<RegisterAdmin />} />
+
 
         <Route
           path="/admin"

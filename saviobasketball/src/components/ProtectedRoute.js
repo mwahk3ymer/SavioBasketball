@@ -1,22 +1,36 @@
 // src/components/ProtectedRoute.js
 import React from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { auth } from "../firebase";
-
-const adminEmails = ["admin1@example.com", "admin2@example.com"];
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const ProtectedRoute = ({ children, role }) => {
-  const user = auth.currentUser;
+  const [allowed, setAllowed] = useState(null);
 
-  if (!user) return <Navigate to="/" />;
+  useEffect(() => {
+    const checkRole = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setAllowed(false);
+        return;
+      }
 
-  if (role === "admin" && !adminEmails.includes(user.email)) {
-    return <Navigate to="/" />;
-  }
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userData = userDoc.data();
 
-  if (role === "player" && adminEmails.includes(user.email)) {
-    return <Navigate to="/admin" />;
-  }
+      if (userData?.role === role) {
+        setAllowed(true);
+      } else {
+        setAllowed(false);
+      }
+    };
+
+    checkRole();
+  }, [role]);
+
+  if (allowed === null) return <p>Loading...</p>;
+  if (!allowed) return <Navigate to="/" />;
 
   return children;
 };
