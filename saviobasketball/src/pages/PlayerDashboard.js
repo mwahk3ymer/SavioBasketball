@@ -9,6 +9,36 @@ const PlayerDashboard = () => {
   const [isAvailable, setIsAvailable] = useState("yes");
   const [reason, setReason] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user || !date) return;
+
+    const checkExistingSubmission = async () => {
+      const q = query(
+        collection(db, "availability"),
+        where("player", "==", user.email),
+        where("date", "==", date)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const data = querySnapshot.docs[0].data();
+        console.log("📄 Found existing entry:", data);
+        
+
+        setIsAvailable(data.available ? "yes" : "no");
+        setReason(data.reason || "");
+      } else {
+        setIsAvailable("yes");
+        setReason("");
+      }
+    };
+
+    checkExistingSubmission();
+  }, [date]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
