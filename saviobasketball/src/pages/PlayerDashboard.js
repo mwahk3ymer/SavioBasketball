@@ -1,10 +1,11 @@
 // src/pages/PlayerDashboard.js
+console.log("🔥 Current PlayerDashboard loaded");
+
 import React, { useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 const PlayerDashboard = () => {
-  //return <div>Welcome, Player! 🏀</div>;
   const [date, setDate] = useState("");
   const [isAvailable, setIsAvailable] = useState("yes");
   const [reason, setReason] = useState("");
@@ -110,6 +111,5 @@ const styles = {
     cursor: "pointer",
   },
 };
-
 
 export default PlayerDashboard;
