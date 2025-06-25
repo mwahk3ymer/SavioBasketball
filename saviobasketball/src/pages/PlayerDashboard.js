@@ -1,9 +1,8 @@
 // src/pages/PlayerDashboard.js
-console.log("🔥 Current PlayerDashboard loaded");
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs, updateDoc, onSnapshot, } from "firebase/firestore";
 
 const PlayerDashboard = () => {
   const [date, setDate] = useState("");
@@ -14,17 +13,50 @@ const PlayerDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("🧪 Submit button clicked");
+    console.log("🔐 Attempting to submit to Firebase");
+
+
     const user = auth.currentUser;
     if (!user) return alert("User not logged in");
-
+    
     try {
-      await addDoc(collection(db, "availability"), {
-        player: user.email,
-        date: date,
-        available: isAvailable === "yes",
-        reason: isAvailable === "no" ? reason : "",
-        submittedAt: Timestamp.now(),
-      });
+      const availabilityRef = collection(db, "availability");
+
+// Check if this player already submitted for this date
+      const q = query(
+        availabilityRef,
+        where("player", "==", user.email),
+        where("date", "==", date)
+      );
+
+const querySnapshot = await getDocs(q);
+
+if (!querySnapshot.empty) {
+  // Update the existing document
+  const docToUpdate = querySnapshot.docs[0].ref;
+
+  await updateDoc(docToUpdate, {
+    available: isAvailable === "yes",
+    reason: isAvailable === "no" ? reason : "",
+    submittedAt: Timestamp.now(),
+  });
+
+  alert("✅ Your availability has been updated.");
+} else {
+  // No existing doc — create a new one
+  await addDoc(availabilityRef, {
+    player: user.email,
+    date: date,
+    available: isAvailable === "yes",
+    reason: isAvailable === "no" ? reason : "",
+    submittedAt: Timestamp.now(),
+  });
+
+  alert("✅ Thanks! Your availability has been submitted.");
+}
+
+
 
       setSuccessMsg("✅ Submitted successfully!");
       setDate("");
@@ -32,6 +64,7 @@ const PlayerDashboard = () => {
       setReason("");
     } catch (err) {
       console.error("Error saving availability:", err);
+      alert("❌ Something went wrong. Please try again.");
     }
   };
 
