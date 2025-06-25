@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, Timestamp, query, where, getDocs, updateDoc, onSnapshot, } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs, updateDoc,  } from "firebase/firestore";
 
 const PlayerDashboard = () => {
   const [date, setDate] = useState("");
