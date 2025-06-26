@@ -1,7 +1,8 @@
 // src/pages/Login.js
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -11,19 +12,28 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   
-  const adminEmails = ["admin1@example.com", "admin2@example.com"];
+  //const adminEmails = ["admin1@example.com", "admin2@example.com"];
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
         //firebase login
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      // Check user role
-      if (adminEmails.includes(email)) {
+    const docRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(docRef);
+
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/player");
+      }
+    } else {
+      console.error("No user role found in Firestore");
+      setErrorMsg("❌ No user role found. Please contact admin.");
       }
     } catch (error) {
       console.error("Login error:", error);

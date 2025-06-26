@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 const ProtectedRoute = ({ children, role }) => {
   const [allowed, setAllowed] = useState(null);
 
   useEffect(() => {
-    const checkRole = async () => {
-      const user = auth.currentUser;
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setAllowed(false);
         return;
@@ -24,9 +24,9 @@ const ProtectedRoute = ({ children, role }) => {
       } else {
         setAllowed(false);
       }
-    };
+    });
 
-    checkRole();
+    return () => unsubscribe();
   }, [role]);
 
   if (allowed === null) return <p>Loading...</p>;
