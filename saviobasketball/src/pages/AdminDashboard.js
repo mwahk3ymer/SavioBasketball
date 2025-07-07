@@ -3,12 +3,38 @@ import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
+const downloadCSV = (data) => {
+  const headers = ["Date", "Player", "Available", "Reason"];
+  const rows = data.map((entry) => [
+    entry.date,
+    entry.player,
+    entry.available ? "Yes" : "No",
+    entry.reason || "-",
+  ]);
+
+  const csvContent =
+    [headers, ...rows]
+      .map((row) => row.map((field) => `"${field}"`).join(","))
+      .join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "availability_data.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 const AdminDashboard = () => {
   
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterDate, setFilterDate] = useState("");
   const [filterPlayer, setFilterPlayer] = useState("");
+  
   
   
   useEffect(() => {
@@ -34,6 +60,7 @@ const AdminDashboard = () => {
     return matchesDate && matchesPlayer;
   });
 
+
   return (
     <div className="bg-red-100 min-h-screen p-8">
       <h1 className="text-3xl font-bold text-center text-red-700 mb-6">
@@ -56,6 +83,14 @@ const AdminDashboard = () => {
           className="p-2 rounded border border-gray-300 w-full sm:w-1/2"
         />
       </div>
+
+       {/* ⬇️ Export Button */}
+      <button
+        onClick={() => downloadCSV(filteredSubmissions)}
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition mb-4"
+      >
+        ⬇️ Export to CSV
+      </button>
 
       {loading ? (
         <p className="text-gray-700 text-center">Loading submissions...</p>
