@@ -32,6 +32,8 @@ const downloadCSV = (data) => {
 
 const AdminDashboard = () => {
   
+  const [darkMode, setDarkMode] = useState(false);
+
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterDate, setFilterDate] = useState("");
@@ -85,11 +87,22 @@ const AdminDashboard = () => {
   const currentItems = sortedSubmissions.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedSubmissions.length / itemsPerPage);
 
+  
   return (
-    <div className="bg-red-100 min-h-screen p-8">
-      <h1 className="text-3xl font-bold text-center text-red-700 mb-6">
+   <div className={darkMode ? "dark" : ""}>
+    <div className="bg-red-100 dark:bg-gray-900 min-h-screen p-8 text-gray-900 dark:text-gray-100">
+      <h1 className="text-3xl font-bold text-center text-red-700 dark:text-red-400 mb-6">
         🏀 Savio Basketball Admin Dashboard
       </h1>
+
+      <div className="flex justify-end mb-4">
+      <button
+        onClick={() => setDarkMode(!darkMode)}
+        className="mb-4 px-4 py-2 bg-gray-300 dark:bg-gray-700 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition"
+      >
+        {darkMode ? "☀️ Light Mode" : "🌑 Dark Mode"}
+      </button>
+      </div>
 
       <div className="flex gap-4 mb-6 flex-col sm:flex-row">
         <input
@@ -97,14 +110,14 @@ const AdminDashboard = () => {
           placeholder="Filter by date (YYYY-MM-DD)"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          className="p-2 rounded border border-gray-300 w-full sm:w-1/2"
+          className="p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white w-full sm:w-1/2"
         />
         <input
           type="text"
           placeholder="Filter by player email"
           value={filterPlayer}
           onChange={(e) => setFilterPlayer(e.target.value)}
-          className="p-2 rounded border border-gray-300 w-full sm:w-1/2"
+          className="p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white w-full sm:w-1/2"
         />
       </div>
       <div className="flex justify-between items-center mb-4">
@@ -122,14 +135,14 @@ const AdminDashboard = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-700 text-center">Loading submissions...</p>
+        <p className="text-gray-700 text-center dark:text-gray-300">Loading submissions...</p>
       ) : filteredSubmissions.length === 0 ? (
-        <p className="text-center text-gray-600">No matching submissions found.</p>
+        <p className="text-center text-gray-600 dark:text-gray-400">No matching submissions found.</p>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="bg-red-200 text-left">
+              <tr className="bg-red-200 dark:bg-red-800 text-left">
                 <th
                   className="p-3 text-left cursor-pointer"
                   onClick={() => handleSort("date")}
@@ -149,7 +162,7 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {currentItems.map((entry) => (
-                <tr key={entry.id} className="border-t border-gray-200 hover:bg-red-50">
+                <tr key={entry.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-red-50 dark:hover:bg-gray-700">
                   <td className="p-3">{entry.date}</td>
                   <td className="p-3">{entry.player}</td>
                   <td className="p-3">
@@ -174,7 +187,7 @@ const AdminDashboard = () => {
               className={`px-4 py-2 rounded ${
                 currentPage === i + 1
                   ? "bg-red-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
+                  : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
               }`}
             >
               {i + 1}
@@ -183,7 +196,10 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
+    
+  </div>
   );
+  
 };
 
 export default AdminDashboard;
